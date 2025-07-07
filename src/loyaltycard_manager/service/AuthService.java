@@ -1,21 +1,25 @@
 package loyaltycard_manager.service;
 
-import loyaltycard_manager.model.User;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AuthService {
-    private static final List<User> users = new ArrayList<>();
-
+    
+    // In real-world scenarios, this should query the database.
+    private static final Map<String, String> mockDatabase = new HashMap<>();
+    
     static {
-        users.add(new User("admin", "admin123", "admin"));
-        users.add(new User("john", "1234", "customer"));
+        // Sample users (username -> password)
+        mockDatabase.put("adminUser", "admin123");
+        mockDatabase.put("customerUser1", "customer123");
     }
 
-    public static User authenticate(String username, String password) {
-        return users.stream()
-                .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
-                .findFirst()
-                .orElse(null);
+    public boolean authenticateUser(String username, String password) {
+        // Check if username exists and if the password matches
+        String storedPassword = mockDatabase.get(username);
+        
+        // Check password (plain text for demo; use hashed password in production)
+        return storedPassword != null && storedPassword.equals(password);
     }
 }
+

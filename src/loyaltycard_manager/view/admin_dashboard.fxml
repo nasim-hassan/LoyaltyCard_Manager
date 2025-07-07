@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.AdminDashboardController">
+
+    <!-- 🚀 Sidebar -->
+    <left>
+        <VBox spacing="10" style="-fx-background-color: #2C3E50;" prefWidth="180">
+            <padding>
+                <Insets top="20" right="10" bottom="20" left="10"/>
+            </padding>
+            <Label text="Dashboard" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+            <Button text="Home" prefWidth="160"/>
+            <Button text="Users" prefWidth="160"/>
+            <Button text="Cards" prefWidth="160"/>
+            <Button text="Transactions" prefWidth="160"/>
+            <Button text="Logout" prefWidth="160" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+        </VBox>
+    </left>
+
+    <!-- 🌐 Top Bar -->
+    <top>
+        <HBox spacing="10" style="-fx-background-color: #34495E;" prefHeight="50" alignment="CENTER_RIGHT">
+            <padding>
+                <Insets top="10" right="20" bottom="10" left="20"/>
+            </padding>
+            <Label text="Admin Panel" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+        </HBox>
+    </top>
+
+    <!-- 📊 Main Content Area -->
+    <center>
+        <VBox spacing="15" alignment="CENTER">
+            <padding>
+                <Insets top="30" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Label text="Welcome, Admin!" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+            <Separator/>
+
+            <Label text="Summary:" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+            <Label text="• Total Users: 120" />
+            <Label text="• Active Cards: 85" />
+            <Label text="• Today's Transactions: 30" />
+        </VBox>
+    </center>
+</BorderPane>
