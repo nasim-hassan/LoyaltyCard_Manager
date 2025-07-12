@@ -14,45 +14,45 @@
 
     <!-- 🚀 Sidebar -->
     <left>
-        <VBox spacing="10" style="-fx-background-color: #2C3E50;" prefWidth="180">
+        <VBox spacing="15" style="-fx-background-color: #2C3E50;" prefWidth="250">
             <padding>
-                <Insets top="20" right="10" bottom="20" left="10"/>
+                <Insets top="30" right="15" bottom="30" left="15"/>
             </padding>
-            <Label text="Dashboard" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+            <Label text="Dashboard" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
 
-            <Button text="Home" prefWidth="160"/>
-            <Button text="Users" prefWidth="160"/>
-            <Button text="Cards" prefWidth="160"/>
-            <Button text="Transactions" prefWidth="160"/>
-            <Button text="Logout" prefWidth="160" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+            <Button text="Home" prefWidth="200" style="-fx-font-size: 18px;"/>
+            <Button text="Users" prefWidth="200" style="-fx-font-size: 18px;"/>
+            <Button text="Cards" prefWidth="200" style="-fx-font-size: 18px;"/>
+            <Button text="Transactions" prefWidth="200" style="-fx-font-size: 18px;"/>
+            <Button text="Logout" prefWidth="200" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 18px;"/>
         </VBox>
     </left>
 
     <!-- 🌐 Top Bar -->
     <top>
-        <HBox spacing="10" style="-fx-background-color: #34495E;" prefHeight="50" alignment="CENTER_RIGHT">
+        <HBox spacing="20" style="-fx-background-color: #34495E;" prefHeight="70" alignment="CENTER_RIGHT">
             <padding>
-                <Insets top="10" right="20" bottom="10" left="20"/>
+                <Insets top="15" right="30" bottom="15" left="30"/>
             </padding>
-            <Label text="Admin Panel" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+            <Label text="Admin Panel" style="-fx-text-fill: white; -fx-font-size: 20px;"/>
         </HBox>
     </top>
 
     <!-- 📊 Main Content Area -->
     <center>
-        <VBox spacing="15" alignment="CENTER">
+        <VBox spacing="20" alignment="CENTER">
             <padding>
-                <Insets top="30" right="20" bottom="20" left="20"/>
+                <Insets top="40" right="30" bottom="30" left="30"/>
             </padding>
 
-            <Label text="Welcome, Admin!" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+            <Label text="Welcome, Admin!" style="-fx-font-size: 28px; -fx-font-weight: bold;" />
 
             <Separator/>
 
-            <Label text="Summary:" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-            <Label text="• Total Users: 120" />
-            <Label text="• Active Cards: 85" />
-            <Label text="• Today's Transactions: 30" />
+            <Label text="Summary:" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+            <Label text="• Total Users: 120" style="-fx-font-size: 18px;"/>
+            <Label text="• Active Cards: 85" style="-fx-font-size: 18px;"/>
+            <Label text="• Today's Transactions: 30" style="-fx-font-size: 18px;"/>
         </VBox>
     </center>
 </BorderPane>
