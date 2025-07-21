@@ -2,7 +2,14 @@ package controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.scene.Node;
+
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
@@ -36,7 +43,7 @@ public class SignupCustomerController {
             stmt.setString(2, username);
             stmt.setString(3, email);
             stmt.setString(4, phone);
-            stmt.setString(5, password);  // TODO: hash password later
+            stmt.setString(5, password);  // ⚠️ You should hash password later
 
             int rowsInserted = stmt.executeUpdate();
 
@@ -57,8 +64,17 @@ public class SignupCustomerController {
 
     @FXML
     private void goToLogin(ActionEvent event) {
-        // For now, just print. You can add scene switching here later.
-        System.out.println("Go to Login clicked");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/loyaltycard_manager/login_customer.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Customer Login");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Navigation Error", "Unable to open login page.");
+        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String msg) {

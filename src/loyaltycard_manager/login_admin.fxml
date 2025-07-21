@@ -1,11 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1">
-    
-</AnchorPane>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.LoginAdminController">
+
+    <!-- 🌈 Sidebar -->
+    <left>
+        <VBox spacing="20" style="-fx-background-color: linear-gradient(to bottom, #22577a, #274c77);" prefWidth="220">
+            <padding>
+                <Insets top="60" right="20" bottom="60" left="20"/>
+            </padding>
+
+            <Label text="🛡️ Admin Login" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+            <Label text="Manage the loyalty system securely" wrapText="true" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
+        </VBox>
+    </left>
+
+    <!-- 🧾 Top Bar -->
+    <top>
+        <HBox spacing="20" style="-fx-background-color: #16A085;" prefHeight="60" alignment="CENTER_RIGHT">
+            <padding>
+                <Insets top="10" right="25" bottom="10" left="25"/>
+            </padding>
+            <Label text="Admin Portal Access" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+        </HBox>
+    </top>
+
+    <!-- 🧩 Login Form -->
+    <center>
+        <VBox spacing="20" alignment="TOP_CENTER" style="-fx-background-color: #ECF0F1;">
+            <padding>
+                <Insets top="50" right="80" bottom="50" left="80"/>
+            </padding>
+
+            <Label text="Administrator Login" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+
+            <TextField fx:id="usernameField" promptText="Admin Username" prefWidth="300" style="-fx-font-size: 16px;"/>
+            <PasswordField fx:id="passwordField" promptText="Password" prefWidth="300" style="-fx-font-size: 16px;"/>
+
+            <Button text="Login"
+                    onAction="#handleAdminLogin"
+                    style="-fx-background-color: #d62828; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 8px;"
+                    prefWidth="300"/>
+
+            <Hyperlink text="Go to Customer Login"
+                       onAction="#goToCustomerLogin"
+                       style="-fx-font-size: 14px;"/>
+        </VBox>
+    </center>
+</BorderPane>

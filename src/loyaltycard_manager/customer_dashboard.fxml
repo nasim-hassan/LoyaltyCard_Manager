@@ -1,62 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CustomerDashboardController">
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.CustomerDashboardController">
 
     <!-- 🎨 Sidebar -->
     <left>
         <VBox prefWidth="220" spacing="20" style="-fx-background-color: linear-gradient(to bottom, #2C3E50, #34495E);">
             <padding>
-                <Insets bottom="40" left="20" right="20" top="40" />
+                <Insets top="40" bottom="40" left="20" right="20"/>
             </padding>
 
-            <Label style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;" text="🎫 My Loyalty" />
+            <Label text="🎫 My Loyalty" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
 
-            <Button prefWidth="180" style="-fx-background-color: #1ABC9C; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 8px;" text="🏠 Dashboard" />
-            <Button prefWidth="180" style="-fx-background-color: #9B59B6; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 8px;" text="💳 My Card" />
-            <Button prefWidth="180" style="-fx-background-color: #F39C12; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 8px;" text="🧾 Transactions" />
-            <Button prefWidth="180" style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 8px;" text="🚪 Logout" />
+            <Button text="🏠 Dashboard" onAction="#showDashboard" prefWidth="180"
+                    style="-fx-background-color: #1ABC9C; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 8px;"/>
+            <Button text="💳 My Card" onAction="#showMyCards" prefWidth="180"
+                    style="-fx-background-color: #9B59B6; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 8px;"/>
+            <Button text="🧾 Transactions" onAction="#showTransactions" prefWidth="180"
+                    style="-fx-background-color: #F39C12; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 8px;"/>
+            <Button text="🚪 Logout" onAction="#logout" prefWidth="180"
+                    style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 8px;"/>
         </VBox>
     </left>
 
     <!-- 🔷 Top Bar -->
     <top>
         <HBox alignment="CENTER_RIGHT" prefHeight="60" spacing="20" style="-fx-background-color: #2980B9;">
-            <padding>
-                <Insets bottom="10" left="25" right="25" top="10" />
-            </padding>
-            <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="Welcome to Your Dashboard" />
+            <padding><Insets top="10" right="25" bottom="10" left="25"/></padding>
+            <Label text="Welcome to Your Dashboard" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
         </HBox>
     </top>
 
-    <!-- 📊 Main Dashboard Content -->
+    <!-- 📊 Main Content -->
     <center>
-        <VBox alignment="TOP_CENTER" spacing="25" style="-fx-background-color: #ECF0F1;">
-            <padding>
-                <Insets bottom="40" left="50" right="50" top="40" />
-            </padding>
+        <StackPane fx:id="mainContent" style="-fx-background-color: #ECF0F1;">
+            <!-- Dashboard View -->
+            <VBox fx:id="dashboardView" alignment="TOP_CENTER" spacing="25" visible="true" managed="true">
+                <padding><Insets top="40" right="50" bottom="40" left="50"/></padding>
+                <Label text="📄 Overview" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                <Separator prefWidth="600"/>
 
-            <Label style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" text="📄 Card Overview" />
-            <Separator prefWidth="600" />
-
-            <!-- Card Info Box -->
-            <VBox alignment="CENTER_LEFT" prefWidth="500" spacing="10" style="-fx-background-color: #3498DB; -fx-background-radius: 12px; -fx-padding: 20px;">
-                <Label style="-fx-text-fill: white; -fx-font-size: 16px;" text="Card Number:" />
-                <Label fx:id="cardNumberLabel" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
-
-                <Label style="-fx-text-fill: white; -fx-font-size: 16px;" text="Card Type:" />
-                <Label fx:id="cardTypeLabel" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
-
-                <Label style="-fx-text-fill: white; -fx-font-size: 16px;" text="Balance:" />
-                <Label fx:id="balanceLabel" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+                <HBox spacing="30" alignment="CENTER">
+                    <VBox spacing="10" alignment="CENTER" style="-fx-background-color: #1ABC9C; -fx-background-radius: 12px;" prefWidth="180" prefHeight="100">
+                        <Label text="💳 Total Cards" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
+                        <Label fx:id="totalCardsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    </VBox>
+                    <VBox spacing="10" alignment="CENTER" style="-fx-background-color: #3498DB; -fx-background-radius: 12px;" prefWidth="180" prefHeight="100">
+                        <Label text="💰 Available Balance" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
+                        <Label fx:id="balanceLabel" text="৳0" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    </VBox>
+                    <VBox spacing="10" alignment="CENTER" style="-fx-background-color: #E67E22; -fx-background-radius: 12px;" prefWidth="180" prefHeight="100">
+                        <Label text="📆 Monthly Spends" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
+                        <Label fx:id="monthlySpendsLabel" text="৳0" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    </VBox>
+                </HBox>
             </VBox>
-        </VBox>
+
+            <!-- Cards View -->
+            <VBox fx:id="myCardView" alignment="TOP_CENTER" spacing="10" visible="false" managed="false">
+                <Label text="💳 My Cards" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                <TableView fx:id="cardsTable" prefWidth="700">
+                    <columns>
+                        <TableColumn text="Card No" fx:id="colCardNumber" prefWidth="150"/>
+                        <TableColumn text="Type" fx:id="colCardType" prefWidth="150"/>
+                        <TableColumn text="Balance" fx:id="colBalance" prefWidth="120"/>
+                        <TableColumn text="Issued On" fx:id="colIssueDate" prefWidth="180"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- Transactions View -->
+            <VBox fx:id="transactionsView" alignment="TOP_CENTER" spacing="10" visible="false" managed="false">
+                <Label text="🧾 My Transactions" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                <TableView fx:id="transactionsTable" prefWidth="800">
+                    <columns>
+                        <TableColumn text="Card No" fx:id="colTxnCardNumber" prefWidth="140"/>
+                        <TableColumn text="Date" fx:id="colTxnDate" prefWidth="180"/>
+                        <TableColumn text="Amount" fx:id="colTxnAmount" prefWidth="100"/>
+                        <TableColumn text="Discount" fx:id="colTxnDiscount" prefWidth="100"/>
+                        <TableColumn text="Final Amt" fx:id="colTxnFinalAmount" prefWidth="100"/>
+                        <TableColumn text="Type" fx:id="colTxnType" prefWidth="80"/>
+                        <TableColumn text="Remarks" fx:id="colTxnRemarks" prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </StackPane>
     </center>
 </BorderPane>

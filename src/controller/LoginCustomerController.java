@@ -6,9 +6,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.stage.Stage;
+import controller.DatabaseConnection;
+
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 public class LoginCustomerController {
 
@@ -18,25 +24,61 @@ public class LoginCustomerController {
     @FXML
     private PasswordField passwordField;
 
+    @FXML
     public void handleCustomerLogin(ActionEvent event) {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText().trim();
 
-        // Basic dummy login check (customize as needed)
-        if (username.equals("customer") && password.equals("1234")) {
-            System.out.println("Customer logged in!");
-            // You can load the customer dashboard here
-        } else {
-            System.out.println("Invalid credentials!");
+        String sql = "SELECT id FROM users WHERE username = ? AND password = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int userId = rs.getInt("id");
+
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/loyaltycard_manager/customer_dashboard.fxml"));
+                Parent root = loader.load();
+
+                // Pass user ID to dashboard controller
+                CustomerDashboardController controller = loader.getController();
+                controller.setCurrentUserId(userId); // ✅ Set user ID
+
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Customer Dashboard");
+                stage.show();
+            } else {
+                System.out.println("Invalid credentials!");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
+    @FXML
     public void switchToAdminLogin(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/loyaltycard_manager/login_admin.fxml"));
         Scene scene = new Scene(loader.load());
-        Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setScene(scene);
         stage.setTitle("Admin Login");
+        stage.show();
+    }
+
+    @FXML
+    public void goToSignup(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/loyaltycard_manager/signup_customer.fxml"));
+        Scene scene = new Scene(loader.load());
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(scene);
+        stage.setTitle("Customer Sign Up");
         stage.show();
     }
 }

@@ -9,8 +9,8 @@ import javafx.stage.Stage;
 public class LoyaltyCard_Manager extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-//        Parent root = FXMLLoader.load(getClass().getResource("signup_customer.fxml"));
-        Parent root = FXMLLoader.load(getClass().getResource("admin_dashboard.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("login_customer.fxml"));
+//        Parent root = FXMLLoader.load(getClass().getResource("admin_dashboard.fxml"));
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setTitle("Customer Signup");
