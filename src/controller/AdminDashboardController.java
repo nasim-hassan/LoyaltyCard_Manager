@@ -42,6 +42,7 @@ public class AdminDashboardController {
     @FXML private TableColumn<Card, Integer> colCardId;
     @FXML private TableColumn<Card, String> colCardNumberCard, colCardType, colCardUser, colIssueDate;
     @FXML private TableColumn<Card, Double> colBalance;
+    @FXML private TableColumn<Card, String> colExpiryDate;
 
     @FXML
     public void initialize() {
@@ -101,6 +102,8 @@ public class AdminDashboardController {
         colBalance.setCellValueFactory(new PropertyValueFactory<>("balance"));
         colCardUser.setCellValueFactory(new PropertyValueFactory<>("username"));
         colIssueDate.setCellValueFactory(new PropertyValueFactory<>("issueDate"));
+        colExpiryDate.setCellValueFactory(new PropertyValueFactory<>("expiryDate"));
+        colExpiryDate.setCellValueFactory(new PropertyValueFactory<>("expiryDate"));
     }
 
     @FXML private void showDashboard() {
@@ -184,29 +187,44 @@ public class AdminDashboardController {
 
     private void loadCardsData() {
         ObservableList<Card> cardList = FXCollections.observableArrayList();
-        String query = "SELECT c.id, c.card_number, ct.name AS type, c.balance, u.username, c.issue_date FROM cards c JOIN card_types ct ON c.card_type_id = ct.id JOIN users u ON c.user_id = u.id ORDER BY c.issue_date DESC";
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(query); ResultSet rs = stmt.executeQuery()) {
+        String query = "SELECT c.id, c.card_number, ct.name AS type, c.balance, u.username, c.issue_date, c.expiry_date " +
+                       "FROM cards c " +
+                       "JOIN card_types ct ON c.card_type_id = ct.id " +
+                       "JOIN users u ON c.user_id = u.id " +
+                       "ORDER BY c.issue_date DESC";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
                 cardList.add(new Card(
-                    rs.getInt("id"), rs.getString("card_number"), rs.getString("type"),
-                    rs.getDouble("balance"), rs.getString("username"),
-                    rs.getTimestamp("issue_date").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    rs.getInt("id"),
+                    rs.getString("card_number"),
+                    rs.getString("type"),
+                    rs.getDouble("balance"),
+                    rs.getString("username"),
+                    rs.getTimestamp("issue_date").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    rs.getTimestamp("expiry_date") != null
+                        ? rs.getTimestamp("expiry_date").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        : "-"
                 ));
             }
+
             cardsTable.setItems(cardList);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+
     private void loadCardTypes() {
         cardTypeComboBox.getItems().clear();
         cardTypeComboBox.getItems().addAll("Silver", "Gold", "Platinum");
         cardTypeComboBox.setOnAction(event -> {
             switch (cardTypeComboBox.getValue()) {
-                case "Silver" -> { priceLabel.setText("5000"); discountLabel.setText("10%"); }
-                case "Gold" -> { priceLabel.setText("10000"); discountLabel.setText("15%"); }
-                case "Platinum" -> { priceLabel.setText("20000"); discountLabel.setText("20%"); }
+                case "Silver" -> { priceLabel.setText("10.00"); discountLabel.setText("5%"); }
+                case "Gold" -> { priceLabel.setText("15.00"); discountLabel.setText("10%"); }
+                case "Platinum" -> { priceLabel.setText("20.00"); discountLabel.setText("15%"); }
                 default -> { priceLabel.setText("-"); discountLabel.setText("-"); }
             }
         });
@@ -225,8 +243,8 @@ public class AdminDashboardController {
         try {
             int userId = Integer.parseInt(userIdText);
 
-            // Set initial balance based on card type
-            double balance = switch (cardType) {
+            // Get balance based on type
+            double balanceToAdd = switch (cardType) {
                 case "Silver" -> 5000.00;
                 case "Gold" -> 10000.00;
                 case "Platinum" -> 15000.00;
@@ -235,7 +253,7 @@ public class AdminDashboardController {
 
             Connection conn = DatabaseConnection.getConnection();
 
-            // Fetch card_type_id from card_types table
+            // Get card_type_id
             PreparedStatement typeStmt = conn.prepareStatement("SELECT id FROM card_types WHERE name = ?");
             typeStmt.setString(1, cardType);
             ResultSet typeRs = typeStmt.executeQuery();
@@ -245,22 +263,49 @@ public class AdminDashboardController {
             }
             int cardTypeId = typeRs.getInt("id");
 
-            // Generate 16-digit numeric card number: 4504XXXXXXXXXXXX
-            long random12Digits = (long)(Math.random() * 1_000_000_000_000L);
-            String randomSuffix = String.format("%012d", random12Digits);
-            String fullCardNumber = "4504" + randomSuffix;
+            // Check if user already has same type card
+            PreparedStatement checkStmt = conn.prepareStatement(
+                "SELECT id, balance FROM cards WHERE user_id = ? AND card_type_id = ?");
+            checkStmt.setInt(1, userId);
+            checkStmt.setInt(2, cardTypeId);
+            ResultSet existingCardRs = checkStmt.executeQuery();
 
-            // Insert into cards table
-            String insert = "INSERT INTO cards (card_number, card_type_id, user_id, balance, issue_date) VALUES (?, ?, ?, ?, NOW())";
-            PreparedStatement insertStmt = conn.prepareStatement(insert);
-            insertStmt.setString(1, fullCardNumber);
-            insertStmt.setInt(2, cardTypeId);
-            insertStmt.setInt(3, userId);
-            insertStmt.setDouble(4, balance);
+            if (existingCardRs.next()) {
+                // 🔁 RENEW existing card
+                int cardId = existingCardRs.getInt("id");
+                double currentBalance = existingCardRs.getDouble("balance");
+                double updatedBalance = currentBalance + balanceToAdd;
 
-            int rows = insertStmt.executeUpdate();
-            showAlert(rows > 0 ? "Card assigned successfully." : "Card assignment failed.");
-            showCards();
+                PreparedStatement updateStmt = conn.prepareStatement(
+                    "UPDATE cards SET balance = ?, expiry_date = DATE_ADD(CURDATE(), INTERVAL 1 YEAR) WHERE id = ?");
+                updateStmt.setDouble(1, updatedBalance);
+                updateStmt.setInt(2, cardId);
+                int updated = updateStmt.executeUpdate();
+
+                if (updated > 0) {
+                    showAlert("Card renewed successfully. Balance adjusted.");
+                    showCards();
+                } else {
+                    showAlert("Renewal failed.");
+                }
+
+            } else {
+                // 🆕 NEW card assignment
+                long random12Digits = (long)(Math.random() * 1_000_000_000_000L);
+                String cardNumber = "4504" + String.format("%012d", random12Digits);
+
+                String insert = "INSERT INTO cards (card_number, card_type_id, user_id, balance, issue_date, expiry_date) " +
+                                "VALUES (?, ?, ?, ?, NOW(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR))";
+                PreparedStatement insertStmt = conn.prepareStatement(insert);
+                insertStmt.setString(1, cardNumber);
+                insertStmt.setInt(2, cardTypeId);
+                insertStmt.setInt(3, userId);
+                insertStmt.setDouble(4, balanceToAdd);
+
+                int rows = insertStmt.executeUpdate();
+                showAlert(rows > 0 ? "Card assigned successfully." : "Card assignment failed.");
+                showCards();
+            }
 
         } catch (NumberFormatException e) {
             showAlert("User ID must be a valid number.");
@@ -275,44 +320,70 @@ public class AdminDashboardController {
     private void handlePayment() {
         String cardNumber = cardNumberField.getText();
         String amountText = invoiceAmountField.getText();
+
         if (cardNumber.isEmpty() || amountText.isEmpty()) {
             showAlert("Please fill in all fields.");
             return;
         }
+
         try {
-            double amount = Double.parseDouble(amountText);
+            double invoiceAmount = Double.parseDouble(amountText);
             Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement selectStmt = conn.prepareStatement("SELECT id, balance FROM cards WHERE card_number = ?");
-            selectStmt.setString(1, cardNumber);
-            ResultSet rs = selectStmt.executeQuery();
+
+            // 1. Get card info
+            PreparedStatement cardStmt = conn.prepareStatement(
+                    "SELECT c.id, c.balance, ct.discount_percentage " +
+                    "FROM cards c " +
+                    "JOIN card_types ct ON c.card_type_id = ct.id " +
+                    "WHERE c.card_number = ?");
+            cardStmt.setString(1, cardNumber);
+            ResultSet rs = cardStmt.executeQuery();
+
             if (!rs.next()) {
                 showAlert("Card not found.");
                 return;
             }
+
             int cardId = rs.getInt("id");
             double currentBalance = rs.getDouble("balance");
-            if (currentBalance < amount) {
-                showAlert("Insufficient balance.");
+            double discountPercentage = rs.getDouble("discount_percentage");
+
+            // 2. Calculate discount
+            double discount = (invoiceAmount * discountPercentage) / 100;
+            double finalAmount = invoiceAmount - discount;
+
+            if (currentBalance < finalAmount) {
+                showAlert("Insufficient balance after applying discount.");
                 return;
             }
-            double finalBalance = currentBalance - amount;
+
+            double newBalance = currentBalance - finalAmount;
+
+            // 3. Update balance
             PreparedStatement updateStmt = conn.prepareStatement("UPDATE cards SET balance = ? WHERE id = ?");
-            updateStmt.setDouble(1, finalBalance);
+            updateStmt.setDouble(1, newBalance);
             updateStmt.setInt(2, cardId);
             updateStmt.executeUpdate();
 
-            PreparedStatement txnStmt = conn.prepareStatement("INSERT INTO transactions (card_id, amount, discount_applied, final_amount, balance_after_txn, txn_type, remarks) VALUES (?, ?, 0.00, ?, ?, 'Purchase', 'Invoice Payment')");
+            // 4. Record transaction
+            PreparedStatement txnStmt = conn.prepareStatement(
+                    "INSERT INTO transactions (card_id, amount, discount_applied, final_amount, balance_after_txn, txn_type, remarks) " +
+                    "VALUES (?, ?, ?, ?, ?, 'Purchase', 'Invoice Payment')");
             txnStmt.setInt(1, cardId);
-            txnStmt.setDouble(2, amount);
-            txnStmt.setDouble(3, amount);
-            txnStmt.setDouble(4, finalBalance);
+            txnStmt.setDouble(2, invoiceAmount);
+            txnStmt.setDouble(3, discount);
+            txnStmt.setDouble(4, finalAmount);
+            txnStmt.setDouble(5, newBalance);
             txnStmt.executeUpdate();
 
-            showAlert("Payment successful.");
+            showAlert("Payment successful. Discount Applied: ৳" + discount);
             showCards();
+
+        } catch (NumberFormatException e) {
+            showAlert("Invalid amount format.");
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Payment failed.");
+            showAlert("Payment failed due to system error.");
         }
     }
 

@@ -14,7 +14,6 @@
             <padding>
                 <Insets top="60" right="20" bottom="60" left="20"/>
             </padding>
-
             <Label text="🛡️ Admin Login" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
             <Label text="Manage the loyalty system securely" wrapText="true" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
         </VBox>
@@ -41,6 +40,9 @@
 
             <TextField fx:id="usernameField" promptText="Admin Username" prefWidth="300" style="-fx-font-size: 16px;"/>
             <PasswordField fx:id="passwordField" promptText="Password" prefWidth="300" style="-fx-font-size: 16px;"/>
+
+            <!-- 🔴 Error Message -->
+            <Label fx:id="errorLabel" text="" style="-fx-text-fill: red; -fx-font-size: 14px;" />
 
             <Button text="Login"
                     onAction="#handleAdminLogin"

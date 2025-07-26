@@ -16,23 +16,22 @@ import java.time.format.DateTimeFormatter;
 
 public class CustomerDashboardController {
 
-    // UI Elements
     @FXML private VBox dashboardView, myCardView, transactionsView;
     @FXML private Label totalCardsLabel, balanceLabel, monthlySpendsLabel;
     @FXML private TableView<Card> cardsTable;
-    @FXML private TableColumn<Card, String> colCardNumber, colCardType, colIssueDate;
+    @FXML private TableColumn<Card, String> colCardNumber, colCardType, colIssueDate, colExpiryDate;
     @FXML private TableColumn<Card, Double> colBalance;
 
     @FXML private TableView<Transaction> transactionsTable;
     @FXML private TableColumn<Transaction, String> colTxnCardNumber, colTxnDate, colTxnType, colTxnRemarks;
     @FXML private TableColumn<Transaction, Double> colTxnAmount, colTxnDiscount, colTxnFinalAmount;
 
+
     private int currentUserId;
 
-    // Set from login controller
     public void setCurrentUserId(int userId) {
         this.currentUserId = userId;
-        showDashboard(); // 🚀 Load dashboard immediately
+        showDashboard();
     }
 
     @FXML
@@ -63,7 +62,6 @@ public class CustomerDashboardController {
 
     private void loadDashboardData() {
         try (Connection conn = DatabaseConnection.getConnection()) {
-            // Total cards and balance
             String sql = """
                 SELECT COUNT(*) AS card_count, 
                        COALESCE(SUM(balance), 0) AS total_balance 
@@ -78,7 +76,6 @@ public class CustomerDashboardController {
                 balanceLabel.setText("৳" + rs.getDouble("total_balance"));
             }
 
-            // Monthly spend
             String spendSql = """
                 SELECT COALESCE(SUM(final_amount), 0) AS monthly_spend
                 FROM transactions t
@@ -101,7 +98,7 @@ public class CustomerDashboardController {
 
         try (Connection conn = DatabaseConnection.getConnection()) {
             String sql = """
-                SELECT c.card_number, ct.name AS type, c.balance, c.issue_date
+                SELECT c.card_number, ct.name AS type, c.balance, c.issue_date, c.expiry_date
                 FROM cards c
                 JOIN card_types ct ON c.card_type_id = ct.id
                 WHERE c.user_id = ?
@@ -117,14 +114,19 @@ public class CustomerDashboardController {
                 double balance = rs.getDouble("balance");
                 String issued = rs.getTimestamp("issue_date").toLocalDateTime()
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                String expiry = rs.getDate("expiry_date") != null
+                    ? rs.getDate("expiry_date").toLocalDate().toString()
+                    : "-";
 
-                cardList.add(new Card(0, number, type, balance, "", issued));
+
+                cardList.add(new Card(0, number, type, balance, "", issued, expiry));
             }
 
             colCardNumber.setCellValueFactory(cell -> cell.getValue().cardNumberProperty());
             colCardType.setCellValueFactory(cell -> cell.getValue().cardTypeProperty());
             colBalance.setCellValueFactory(cell -> cell.getValue().balanceProperty().asObject());
             colIssueDate.setCellValueFactory(cell -> cell.getValue().issueDateProperty());
+            colExpiryDate.setCellValueFactory(cell -> cell.getValue().expiryDateProperty());
 
             cardsTable.setItems(cardList);
         } catch (Exception e) {

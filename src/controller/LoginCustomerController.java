@@ -6,10 +6,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
-import controller.DatabaseConnection;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -25,9 +25,19 @@ public class LoginCustomerController {
     private PasswordField passwordField;
 
     @FXML
+    private Label errorLabel; // ✅ Added to show error messages in UI
+
+    @FXML
     public void handleCustomerLogin(ActionEvent event) {
         String username = usernameField.getText().trim();
         String password = passwordField.getText().trim();
+
+        errorLabel.setText(""); // Clear any previous error
+
+        if (username.isEmpty() || password.isEmpty()) {
+            errorLabel.setText("Please enter both username and password.");
+            return;
+        }
 
         String sql = "SELECT id FROM users WHERE username = ? AND password = ?";
 
@@ -47,18 +57,19 @@ public class LoginCustomerController {
 
                 // Pass user ID to dashboard controller
                 CustomerDashboardController controller = loader.getController();
-                controller.setCurrentUserId(userId); // ✅ Set user ID
+                controller.setCurrentUserId(userId);
 
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
                 stage.setTitle("Customer Dashboard");
                 stage.show();
             } else {
-                System.out.println("Invalid credentials!");
+                errorLabel.setText("Invalid username or password.");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            errorLabel.setText("Login failed due to system error.");
         }
     }
 

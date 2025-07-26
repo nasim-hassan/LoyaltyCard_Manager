@@ -120,6 +120,7 @@
                         <TableColumn fx:id="colBalance" text="Balance" prefWidth="100"/>
                         <TableColumn fx:id="colCardUser" text="User" prefWidth="120"/>
                         <TableColumn fx:id="colIssueDate" text="Issued At" prefWidth="150"/>
+                        <TableColumn fx:id="colExpiryDate" text="Expiry Date" prefWidth="150"/>
                     </columns>
                 </TableView>
                 <Button text="Back to Dashboard" onAction="#showDashboard"

@@ -64,14 +64,16 @@
             <!-- Cards View -->
             <VBox fx:id="myCardView" alignment="TOP_CENTER" spacing="10" visible="false" managed="false">
                 <Label text="💳 My Cards" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
-                <TableView fx:id="cardsTable" prefWidth="700">
+                <TableView fx:id="cardsTable" prefHeight="300" prefWidth="800">
                     <columns>
-                        <TableColumn text="Card No" fx:id="colCardNumber" prefWidth="150"/>
-                        <TableColumn text="Type" fx:id="colCardType" prefWidth="150"/>
-                        <TableColumn text="Balance" fx:id="colBalance" prefWidth="120"/>
-                        <TableColumn text="Issued On" fx:id="colIssueDate" prefWidth="180"/>
+                        <TableColumn fx:id="colCardNumber" text="Card Number" prefWidth="150"/>
+                        <TableColumn fx:id="colCardType" text="Card Type" prefWidth="100"/>
+                        <TableColumn fx:id="colBalance" text="Balance" prefWidth="100"/>
+                        <TableColumn fx:id="colIssueDate" text="Issue Date" prefWidth="150"/>
+                        <TableColumn fx:id="colExpiryDate" text="Expiry Date" prefWidth="150"/> 
                     </columns>
                 </TableView>
+
             </VBox>
 
             <!-- Transactions View -->

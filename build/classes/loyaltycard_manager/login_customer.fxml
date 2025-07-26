@@ -42,7 +42,7 @@
             <PasswordField fx:id="passwordField" promptText="Password" prefWidth="300" style="-fx-font-size: 18px;"/>
 
             <!-- 🔴 Error Message Label -->
-            <Label fx:id="errorLabel" text="" style="-fx-text-fill: red; -fx-font-size: 14px;"/>
+            <Label fx:id="errorLabel" text="" style="-fx-text-fill: red; -fx-font-size: 14px;" />
 
             <Button text="Login"
                     onAction="#handleCustomerLogin"
