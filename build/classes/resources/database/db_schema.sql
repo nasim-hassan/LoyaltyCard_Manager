@@ -1,11 +1,10 @@
--- loyalty_db schema
-Database : user : admin
-password : 95Mu0_g,6Ps:
-Database : loyaltycard_manager  -- Create the user (change 'newuser' and 'password123' as you want)
+-- Create the user
 CREATE USER 'admin'@'%' IDENTIFIED BY '95Mu0_g,6Ps:';
--- Grant ALL privileges on all databases and tables
-GRANT ALL PRIVILEGES ON . TO 'admin'@'%' WITH GRANT OPTION;
--- Apply the changes immediately
+
+-- Grant all privileges on all databases and tables
+GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' WITH GRANT OPTION;
+
+-- Apply the changes (optional, in modern MySQL this happens automatically)
 FLUSH PRIVILEGES;
 
 -- 🎯 Create database
@@ -47,11 +46,13 @@ CREATE TABLE IF NOT EXISTS cards (
     user_id INT NOT NULL,
     issued_by_admin_id INT,
     issue_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expiry_date DATE,
     CHECK (card_number LIKE '4504%'),
     FOREIGN KEY (card_type_id) REFERENCES card_types(id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (issued_by_admin_id) REFERENCES admins(id)
 );
+
 
 -- 💸 Transactions Table
 CREATE TABLE IF NOT EXISTS transactions (
@@ -73,3 +74,7 @@ VALUES
 ('Silver', 10.00, 5000.00),
 ('Gold', 15.00, 10000.00),
 ('Platinum', 20.00, 15000.00);
+
+
+-- Create Default Admin
+INSERT INTO admins (username, password) VALUES ('admin', 'admin');
